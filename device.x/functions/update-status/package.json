@@ -15,6 +15,6 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.400.0",
-    "pg": "^8.0.0"
+    "pg": "^8.14.1"
   }
 }

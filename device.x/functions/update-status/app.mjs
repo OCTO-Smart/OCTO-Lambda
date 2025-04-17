@@ -9,7 +9,10 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const REGION = "eu-central-1"
+// Start log
+console.log("App installed (app.mjs file).");
+
+const REGION = "eu-central-1";
 const BUCKET_NAME = "ivocdevices";
 
 const DB_HOST = "ivocdev.cxiqcy2uo0c3.eu-central-1.rds.amazonaws.com";
@@ -17,83 +20,91 @@ const DB_NAME = "ivocdev";
 const DB_USER = "ivoc";
 const DB_PASSWORD = "ivocDevDB!";
 
+// Create S3 client
+const s3 = new S3Client({ region: REGION });
 
-// S3 client oluştur
-const s3 = new S3Client({ region: REGION }); 
-
-/**
- * Sample Lambda function which mocks the operation of checking the current price of a stock.
- * For demonstration purposes this Lambda function simply returns a random integer between 0 and 100 as the stock price.
- * 
- * @param {Object} event - Input event to the Lambda function
- * @param {Object} context - Lambda Context runtime methods and attributes
- *
- * @returns {Object} object - Object containing the current price of the stock
- * 
- */
 export const lambdaHandler = async (event, context) => {
-    try {
-        console.log("Received event:", JSON.stringify(event));
+  console.log("Lambda started .");
 
-        // Event'ten 'body' kısmını al (API Gateway kullanılıyorsa body string olabilir)
-        const data = event.body ? JSON.parse(event.body) : event;
+  try {
+    console.log("Incoming event:", JSON.stringify(event));
 
-        if (data.dn == "IVOC2") {
-            const client = new Client({
-                host: DB_HOST,
-                database: DB_NAME,
-                user: DB_USER,
-                password: DB_PASSWORD,
-                port: 5432,
-                ssl: {
-                    rejectUnauthorized: true, // Ensures SSL verification
-                    ca: fs.readFileSync(path.join(__dirname, 'eu-central-1-bundle.pem')).toString()
-                }
-            });
+    const data = event.body ? JSON.parse(event.body) : event;
+    console.log("JSON parsed:", data);
 
-            await client.connect();
+    const deviceName = data.dn;
+    if (!deviceName) throw new Error("Device name (dn) not found in JSON");
+    console.log("Device name :", deviceName);
 
-            await client.query(
-                "UPDATE device_status SET status = $1, updated_at = NOW() WHERE device_id = $2",
-                [JSON.stringify(data), 2]
-            );
+    const pemPath = path.join(__dirname, 'eu-central-1-bundle.pem');
+    console.log("PEM way:", pemPath);
+    console.log("Is there a PEM file:", fs.existsSync(pemPath) ? "Yes " : "No ");
 
-            await client.end();
-        }
+    // Temporary test connection instead of PEM
+    const client = new Client({
+      host: DB_HOST,
+      database: DB_NAME,
+      user: DB_USER,
+      password: DB_PASSWORD,
+      port: 5432,
+      ssl: {
+        rejectUnauthorized: false // <-- PEM disabled for testing
+      }
+    });
 
-        // JSON'u bir dosya olarak kaydetmek için ad oluştur
-        const fileName = `${data.dn}.json`;
+    console.log("Connecting to database...");
+    await client.connect();
+    console.log("DB connection successful.");
 
-        // JSON'u S3'e yükle
-        const uploadParams = {
-            Bucket: BUCKET_NAME,
-            Key: fileName,
-            Body: JSON.stringify(data),
-            ContentType: "application/json"
-        };
+    const res = await client.query(
+      "SELECT id FROM device WHERE name = $1",
+      [deviceName]
+    );
 
-        await s3.send(new PutObjectCommand(uploadParams));
+    const deviceId = res.rows[0]?.id;
+    console.log("Found device_id: ", deviceId);
 
+    if (!deviceId) throw new Error(`Device '${deviceName}' not found in devices table`);
 
-        // Başarılı yanıt döndür
-        return {
-            statusCode: 200,
-            body: JSON.stringify({
-                message: "JSON data successfully saved to S3",
-                fileName: fileName
-            }),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        };
-    } catch (error) {
-        console.error("Error:", error);
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ error: error.message }),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        };
-    }
+    await client.query(
+      "UPDATE device_status SET status = $1, updated_at = NOW() WHERE device_id = $2",
+      [JSON.stringify(data), deviceId]
+    );
+
+    console.log("Status has been updated. ");
+    await client.end();
+
+    const fileName = `${deviceName}-${Date.now()}.json`;
+    const uploadParams = {
+      Bucket: BUCKET_NAME,
+      Key: fileName,
+      Body: JSON.stringify(data),
+      ContentType: "application/json"
+    };
+
+    console.log("Writing to S3: ", fileName);
+    await s3.send(new PutObjectCommand(uploadParams));
+    console.log("Successfully written to S3. ");
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: "Data was successfully written to S3 and PostgreSQL.",
+        fileName: fileName
+      }),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    };
+
+  } catch (error) {
+    console.error("ERROR:", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: error.message }),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    };
+  }
 };

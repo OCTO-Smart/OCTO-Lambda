@@ -8,6 +8,7 @@ Resources:
     Type: AWS::Serverless::HttpApi
     Properties:
       StageName: $default
+
   UpdateStatusFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -15,7 +16,8 @@ Resources:
       Handler: app.lambdaHandler
       Runtime: nodejs22.x
       Architectures:
-        - arm64
+        - x86_64
+      Timeout: 30
       Policies:
         - Version: '2012-10-17'
           Statement:
@@ -26,9 +28,17 @@ Resources:
                 - arn:aws:s3:::ivocdevices/*
       Events:
         UpdateStatus:
-          Type: HttpApi # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: HttpApi
           Properties:
             ApiId: !Ref MyExistingHttpApi
             Path: /device/update-status
             Method: post
+    Metadata:
+      DockerContext: .
+      Dockerfile: Dockerfile
 
+Outputs:
+  UpdateStatusApi:
+    Description: "API Gateway endpoint for UpdateStatusFunction"
+    Value:
+      Fn::Sub: "https://${MyExistingHttpApi}.execute-api.${AWS::Region}.amazonaws.com/device/update-status"
