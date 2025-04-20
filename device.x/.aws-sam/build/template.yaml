@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'device.x - Python version
+
+  '
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: python3.12
+    Architectures:
+    - x86_64
+Resources:
+  MyExistingHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: $default
+  UpdateStatusFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: UpdateStatusFunction
+      Handler: app.lambda_handler
+      Policies:
+      - S3WritePolicy:
+          BucketName: ivocdevices
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - rds-db:connect
+          Resource: '*'
+      Events:
+        UpdateStatus:
+          Type: HttpApi
+          Properties:
+            ApiId:
+              Ref: MyExistingHttpApi
+            Path: /device/update-status
+            Method: POST
+    Metadata:
+      SamResourceId: UpdateStatusFunction
+Outputs:
+  UpdateStatusApi:
+    Description: API Gateway endpoint for UpdateStatusFunction
+    Value:
+      Fn::Sub: https://${MyExistingHttpApi}.execute-api.${AWS::Region}.amazonaws.com/device/update-status
