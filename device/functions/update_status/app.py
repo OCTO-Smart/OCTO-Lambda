@@ -3,28 +3,30 @@ import boto3
 import psycopg2
 from datetime import datetime
 import logging
-from pathlib import Path
 import os
 
-print("DEBUG: ENV =", os.getenv("ENV"))
-print("DEBUG: DB_HOST =", os.getenv("DB_HOST"))
-
-# Configure logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-# Ortam değişkenlerinden verileri al
-REGION = os.getenv("REGION")
 
-DB_HOST = os.getenv("DB_HOST")
-DB_NAME = os.getenv("DB_NAME")
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.environ.get("DB_HOST")
+DB_NAME = os.environ.get("DB_NAME")
+DB_USER = os.environ.get("DB_USER")
+DB_PASSWORD = os.environ.get("DB_PASSWORD")
+REGION = os.environ.get("REGION")
+ENV = os.environ.get("ENV")
+BUCKET_NAME = os.environ.get("BUCKET_NAME")
+
+print("DEBUG: ENV =", ENV)
+print("DEBUG: DB_HOST =", DB_HOST)
+print("DEBUG: BUCKET_NAME =", BUCKET_NAME)
 
 logger.info(f"Loaded DB_HOST: {DB_HOST}")
 logger.info("Initializing boto3 S3 client...")
+
 s3 = boto3.client("s3", region_name=REGION)
 logger.info("S3 client initialized.")
+
 
 def lambda_handler(event, context):
     logger.info("Lambda started.")
