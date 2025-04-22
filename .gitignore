@@ -1,2 +1,4 @@
 
 .DS_Store
+device/.aws-sam/build/
+device/.aws-sam/deps/
