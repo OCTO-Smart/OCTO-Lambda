@@ -3,21 +3,29 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   device
 
-  Sample SAM Template for device
-
-Globals:
-  Function:
-    Timeout: 30
-
 Resources:
-  UpdateStatusFunction:
+ MyExistingHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: $default
+
+ UpdateStatusFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: functions/update_status/
+      CodeUri: functions/update-status/
       Handler: app.lambda_handler
       Runtime: python3.12
       Architectures:
         - x86_64
+      Timeout: 30
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - s3:PutObject
+              Resource:
+                - arn:aws:s3:::ivocdevices/*
       Environment:
         Variables:
           DB_HOST: ""
@@ -26,21 +34,19 @@ Resources:
           DB_PASSWORD: ""
           REGION: ""
           ENV: ""
-          BUCKET_NAME: ""
       Events:
-        HelloWorld:
-          Type: Api
+        UpdateStatus:
+          Type: HttpApi
           Properties:
-            Path: /hello
+            ApiId: !Ref MyExistingHttpApi
+            Path: /device/update-status
             Method: post
+    Metadata:
+      DockerContext: .
+      Dockerfile: Dockerfile
 
 Outputs:
-  HelloWorldApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  UpdateStatusFunction:
-    Description: "Update Status Lambda Function ARN"
-    Value: !GetAtt UpdateStatusFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt UpdateStatusFunctionRole.Arn
+  UpdateStatusApi:
+    Description: "API Gateway endpoint for UpdateStatusFunction"
+    Value:
+      Fn::Sub: "https://${MyExistingHttpApi}.execute-api.${AWS::Region}.amazonaws.com/device/update-status"

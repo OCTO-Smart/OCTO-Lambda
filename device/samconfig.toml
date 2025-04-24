@@ -3,7 +3,7 @@
 version = 0.1
 
 [default.global.parameters]
-stack_name = "device"
+stack_name = "device-development"
 
 [default.build.parameters]
 cached = true
@@ -16,6 +16,10 @@ lint = true
 capabilities = "CAPABILITY_IAM"
 confirm_changeset = true
 resolve_s3 = true
+stack_name = "device-development-stack"
+s3_prefix = "device-development-stack"
+region = "eu-central-1"
+image_repositories = []
 
 [default.package.parameters]
 resolve_s3 = true
