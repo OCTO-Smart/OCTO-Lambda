@@ -3,6 +3,21 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   device
 
+Parameters:
+  Environment:
+    Type: String
+    Default: "development"
+  DBHOST:
+    Type: String
+  DBNAME:
+    Type: String
+  DBUSER:
+    Type: String
+  DBPASSWORD:
+    Type: String
+  REGION:
+    Type: String
+
 Resources:
  MyExistingHttpApi:
     Type: AWS::Serverless::HttpApi
@@ -28,12 +43,12 @@ Resources:
                 - arn:aws:s3:::ivocdevices/*
       Environment:
         Variables:
-          DB_HOST: ""
-          DB_NAME: ""
-          DB_USER: ""
-          DB_PASSWORD: ""
-          REGION: ""
-          ENV: ""
+          DB_HOST: !Ref DBHOST
+          DB_NAME: !Ref DBNAME
+          DB_USER: !Ref DBUSER
+          DB_PASSWORD: !Ref DBPASSWORD
+          REGION: !Ref REGION
+          ENV: !Ref Environment
       Events:
         UpdateStatus:
           Type: HttpApi

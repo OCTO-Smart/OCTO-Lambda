@@ -2,3 +2,5 @@
 .DS_Store
 device/.aws-sam/build/
 device/.aws-sam/deps/
+
+device/.aws-sam/build.toml

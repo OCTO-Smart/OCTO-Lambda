@@ -46,7 +46,7 @@ def lambda_handler(event, context):
         logger.info(f"Step 3: Device name extracted: {device_name}")
         print("Device name found:", device_name)
 
-        file_name = f"{device_name}-{int(datetime.utcnow().timestamp() * 1000)}.json"
+        file_name = f"{device_name}.json"
         logger.info(f"Step 4: S3 file name generated: {file_name}")
 
         logger.info("Step 5: Attempting to write to S3...")

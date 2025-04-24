@@ -12,14 +12,49 @@ parallel = true
 [default.validate.parameters]
 lint = true
 
+# Geliştirme ortamı
+[development.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = true
+resolve_s3 = true
+image_repositories = []
+stack_name = "device-stack-development"
+region = "eu-central-1"
+s3_prefix = "device-stack-development"
+parameter_overrides = "Environment=development DBHOST=ivocdev.cxiqcy2uo0c3.eu-central-1.rds.amazonaws.com DBNAME=ivocdev DBUSER=ivoc DBPASSWORD=ivocDevDB! REGION=eu-central-1"
+
+# UAT ortamı
+[uat.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = true
+resolve_s3 = true
+image_repositories = []
+stack_name = "device-stack-uat"
+region = "eu-central-1"
+s3_prefix = "device-stack-uat"
+parameter_overrides = "Environment=uat ApiKey=uat-456"
+
+# Production ortamı
+[production.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = true
+resolve_s3 = true
+image_repositories = []
+stack_name = "device-stack-production"
+region = "eu-central-1"
+s3_prefix = "device-stack-production"
+parameter_overrides = "Environment=production ApiKey=prod-789"
+
 [default.deploy.parameters]
 capabilities = "CAPABILITY_IAM"
 confirm_changeset = true
 resolve_s3 = true
-stack_name = "device-development-stack"
-s3_prefix = "device-development-stack"
-region = "eu-central-1"
 image_repositories = []
+stack_name = "device-stack-development"
+region = "eu-central-1"
+s3_prefix = "device-stack-development"
+parameter_overrides = "Environment=development DBHOST=ivocdev.cxiqcy2uo0c3.eu-central-1.rds.amazonaws.com DBNAME=ivocdev DBUSER=ivoc DBPASSWORD=ivocDevDB! REGION=eu-central-1"
+
 
 [default.package.parameters]
 resolve_s3 = true
