@@ -15,7 +15,7 @@ DB_USER = os.environ.get("DB_USER")
 DB_PASSWORD = os.environ.get("DB_PASSWORD")
 REGION = os.environ.get("REGION")
 ENV = os.environ.get("ENV")
-BUCKET_NAME = os.environ.get("BUCKET_NAME")
+BUCKET_NAME = "ivocdevices"
 
 print("DEBUG: ENV =", ENV)
 print("DEBUG: DB_HOST =", DB_HOST)

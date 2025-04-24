@@ -1,11 +1,10 @@
 {
   "Parameters": {
+    "ENV": "Development",
     "DB_HOST": "ivocdev.cxiqcy2uo0c3.eu-central-1.rds.amazonaws.com",
     "DB_NAME": "ivocdev",
     "DB_USER": "ivoc",
     "DB_PASSWORD": "ivocDevDB!",
-    "REGION": "eu-central-1",
-    "ENV": "test",
-    "BUCKET_NAME": "ivocdevices"
+    "REGION": "eu-central-1"
   }
 }
