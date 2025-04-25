@@ -53,7 +53,7 @@ image_repositories = []
 stack_name = "device-stack-development"
 region = "eu-central-1"
 s3_prefix = "device-stack-development"
-parameter_overrides = "Environment=development DBHOST=ivocdev.cxiqcy2uo0c3.eu-central-1.rds.amazonaws.com DBNAME=ivocdev DBUSER=ivoc DBPASSWORD=ivocDevDB! REGION=eu-central-1"
+parameter_overrides = "Environment=\"development\" DBHOST=\"ivocdev.cxiqcy2uo0c3.eu-central-1.rds.amazonaws.com\" DBNAME=\"ivocdev\" DBUSER=\"ivoc\" DBPASSWORD=\"ivocDevDB!\" REGION=\"eu-central-1\""
 
 
 [default.package.parameters]
