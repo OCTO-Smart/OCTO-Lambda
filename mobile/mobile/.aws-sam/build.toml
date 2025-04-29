@@ -20,4 +20,13 @@ manifest_hash = "30a77242227a85a29c98942a2208d62a"
 packagetype = "Zip"
 functions = ["ListDevicesFunction"]
 
+[function_build_definitions.2c2122ed-1245-484a-95a4-df367f953350]
+codeuri = "C:\\Users\\Mert\\Documents\\OCTO-Lambda\\mobile\\mobile\\cognito-client"
+runtime = "python3.12"
+architecture = "x86_64"
+handler = "signup.sign_up"
+manifest_hash = ""
+packagetype = "Zip"
+functions = ["PostConfirmationFunction"]
+
 [layer_build_definitions]

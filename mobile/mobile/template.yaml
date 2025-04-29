@@ -19,12 +19,10 @@ Parameters:
     Type: String
 
 Resources:
-  # Cognito User Pool: Kullanıcı kaydı ve oturum açma (e-posta onayı devre dışı)
   CognitoUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
       UserPoolName: !Sub "${AWS::StackName}-UserPool"
-      # Email doğrulama ve onay kodu gereksinimini kaldırdık
       AutoVerifiedAttributes: []
       UsernameAttributes:
         - email
@@ -35,8 +33,9 @@ Resources:
           RequireLowercase: true
           RequireNumbers: true
           RequireSymbols: false
+      LambdaConfig:
+        PostConfirmation: !GetAtt PostConfirmationFunction.Arn
 
-  # Cognito App Client: Token üretimi
   CognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
@@ -44,11 +43,10 @@ Resources:
       UserPoolId: !Ref CognitoUserPool
       ExplicitAuthFlows:
         - ALLOW_USER_SRP_AUTH
-        - ALLOW_USER_PASSWORD_AUTH   # USER_PASSWORD_AUTH akışını ekledik
+        - ALLOW_USER_PASSWORD_AUTH
         - ALLOW_REFRESH_TOKEN_AUTH
       GenerateSecret: false
 
-  # HTTP API: Cognito Authorizer ile koruma
   HttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
@@ -64,7 +62,6 @@ Resources:
             IdentitySource:
               - "$request.header.Authorization"
 
-  # Lambda: Add Device
   AddDeviceFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -99,7 +96,6 @@ Resources:
             Auth:
               Authorizer: CognitoAuthorizer
 
-  # Lambda: List Devices
   ListDevicesFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -133,6 +129,38 @@ Resources:
             ApiId: !Ref HttpApi
             Auth:
               Authorizer: CognitoAuthorizer
+
+  PostConfirmationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ./cognito-client/
+      Handler: signup.sign_up
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Timeout: 15
+      Environment:
+        Variables:
+          DB_HOST: !Ref DBHOST
+          DB_NAME: !Ref DBNAME
+          DB_USER: !Ref DBUSER
+          DB_PASSWORD: !Ref DBPASSWORD
+          DB_PORT: "5432"
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - rds-db:connect
+              Resource: "*"
+
+  PostConfirmationPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt PostConfirmationFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: cognito-idp.amazonaws.com
+      SourceArn: !GetAtt CognitoUserPool.Arn
 
 Outputs:
   CognitoUserPoolId:
