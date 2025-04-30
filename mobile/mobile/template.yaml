@@ -3,6 +3,8 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   mobile
 
+
+
 Parameters:
   Environment:
     Type: String
@@ -17,6 +19,11 @@ Parameters:
     Type: String
   REGION:
     Type: String
+  COGNITOCLIENTID:
+    Type: String
+  COGNITOPOOLID:
+    Type: String
+
 
 Resources:
   CognitoUserPool:
@@ -33,8 +40,6 @@ Resources:
           RequireLowercase: true
           RequireNumbers: true
           RequireSymbols: false
-      LambdaConfig:
-        PostConfirmation: !GetAtt PostConfirmationFunction.Arn
 
   CognitoUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
@@ -52,20 +57,20 @@ Resources:
     Properties:
       StageName: $default
       Auth:
-        DefaultAuthorizer: CognitoAuthorizer
         Authorizers:
-          CognitoAuthorizer:
+          CognitoAuth:
+            IdentitySource: "$request.header.Authorization"
             JwtConfiguration:
               issuer: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}"
               audience:
                 - !Ref CognitoUserPoolClient
-            IdentitySource:
-              - "$request.header.Authorization"
+        DefaultAuthorizer: CognitoAuth
+      
 
-  AddDeviceFunction:
+  SignUpFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: functions/add-device/
+      CodeUri: functions/signup/
       Handler: app.lambda_handler
       Runtime: python3.12
       Architectures:
@@ -80,12 +85,50 @@ Resources:
               Resource: "*"
       Environment:
         Variables:
-          DB_HOST: !Ref DBHOST
-          DB_NAME: !Ref DBNAME
-          DB_USER: !Ref DBUSER
-          DB_PASSWORD: !Ref DBPASSWORD
+          DBHOST: !Ref DBHOST
+          DBNAME: !Ref DBNAME
+          DBUSER: !Ref DBUSER
+          DBPASSWORD: !Ref DBPASSWORD
           REGION: !Ref REGION
           ENV: !Ref Environment
+          COGNITOCLIENTID: !Ref COGNITOCLIENTID
+          COGNITOPOOLID: !Ref COGNITOPOOLID
+      Events:
+        AddDevice:
+          Type: HttpApi
+          Properties:
+            Path: /user/signup
+            Method: post
+            ApiId: !Ref HttpApi
+            Auth:
+              Authorizer: NONE 
+
+  AddDeviceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/add-device/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Timeout: 15
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - rds-db:connect
+              Resource: "*"
+      Environment:
+        Variables:
+          DBHOST: !Ref DBHOST
+          DBNAME: !Ref DBNAME
+          DBUSER: !Ref DBUSER
+          DBPASSWORD: !Ref DBPASSWORD
+          REGION: !Ref REGION
+          ENV: !Ref Environment
+          COGNITOCLIENTID: !Ref COGNITOCLIENTID
+          COGNITOPOOLID: !Ref COGNITOPOOLID
       Events:
         AddDevice:
           Type: HttpApi
@@ -94,7 +137,8 @@ Resources:
             Method: post
             ApiId: !Ref HttpApi
             Auth:
-              Authorizer: CognitoAuthorizer
+              Authorizer: CognitoAuth
+                       
 
   ListDevicesFunction:
     Type: AWS::Serverless::Function
@@ -114,12 +158,14 @@ Resources:
               Resource: "*"
       Environment:
         Variables:
-          DB_HOST: !Ref DBHOST
-          DB_NAME: !Ref DBNAME
-          DB_USER: !Ref DBUSER
-          DB_PASSWORD: !Ref DBPASSWORD
+          DBHOST: !Ref DBHOST
+          DBNAME: !Ref DBNAME
+          DBUSER: !Ref DBUSER
+          DBPASSWORD: !Ref DBPASSWORD
           REGION: !Ref REGION
           ENV: !Ref Environment
+          COGNITOCLIENTID: !Ref COGNITOCLIENTID
+          COGNITOPOOLID: !Ref COGNITOPOOLID
       Events:
         ListDevices:
           Type: HttpApi
@@ -128,40 +174,9 @@ Resources:
             Method: get
             ApiId: !Ref HttpApi
             Auth:
-              Authorizer: CognitoAuthorizer
+              Authorizer: CognitoAuth
 
-  PostConfirmationFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: ./cognito-client/
-      Handler: signup.sign_up
-      Runtime: python3.12
-      Architectures:
-        - x86_64
-      Timeout: 15
-      Environment:
-        Variables:
-          DB_HOST: !Ref DBHOST
-          DB_NAME: !Ref DBNAME
-          DB_USER: !Ref DBUSER
-          DB_PASSWORD: !Ref DBPASSWORD
-          DB_PORT: "5432"
-      Policies:
-        - Version: '2012-10-17'
-          Statement:
-            - Effect: Allow
-              Action:
-                - rds-db:connect
-              Resource: "*"
-
-  PostConfirmationPermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      FunctionName: !GetAtt PostConfirmationFunction.Arn
-      Action: lambda:InvokeFunction
-      Principal: cognito-idp.amazonaws.com
-      SourceArn: !GetAtt CognitoUserPool.Arn
-
+  
 Outputs:
   CognitoUserPoolId:
     Description: "ID of the Cognito User Pool"
@@ -178,3 +193,7 @@ Outputs:
   ListDevicesApi:
     Description: "API Gateway endpoint for GET /device/list"
     Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/device/list"
+
+  SignUpFunctionApi:
+    Description: "API Gateway endpoint for POST /user/signup"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/user/signup"

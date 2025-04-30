@@ -16,7 +16,15 @@ lint = true
 capabilities = "CAPABILITY_IAM"
 confirm_changeset = true
 resolve_s3 = true
-
+parameter_overrides = [
+  "DBHOST=ivocdev.cxiqcy2uo0c3.eu-central-1.rds.amazonaws.com",
+  "DBNAME=ivocdev",
+  "DBUSER=ivoc",
+  "DBPASSWORD=ivocDevDB!",
+  "REGION=eu-central-1",
+  "COGNITOPOOLID=eu-central-1_sUAALVGPt",
+  "COGNITOCLIENTID=5agpjlspqgev7d9blfacama607",
+]
 [default.package.parameters]
 resolve_s3 = true
 

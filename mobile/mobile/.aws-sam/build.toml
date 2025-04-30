@@ -20,13 +20,13 @@ manifest_hash = "30a77242227a85a29c98942a2208d62a"
 packagetype = "Zip"
 functions = ["ListDevicesFunction"]
 
-[function_build_definitions.2c2122ed-1245-484a-95a4-df367f953350]
-codeuri = "C:\\Users\\Mert\\Documents\\OCTO-Lambda\\mobile\\mobile\\cognito-client"
+[function_build_definitions.2e9a591e-a7ac-46ed-b760-3f2174cd711d]
+codeuri = "C:\\Users\\Mert\\Documents\\OCTO-Lambda\\mobile\\mobile\\functions\\signup"
 runtime = "python3.12"
 architecture = "x86_64"
-handler = "signup.sign_up"
-manifest_hash = ""
+handler = "app.lambda_handler"
+manifest_hash = "ffdd2fc6d93cd6aed2b56771419c5194"
 packagetype = "Zip"
-functions = ["PostConfirmationFunction"]
+functions = ["SignUpFunction"]
 
 [layer_build_definitions]

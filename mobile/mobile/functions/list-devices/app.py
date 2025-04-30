@@ -4,33 +4,38 @@ import logging
 import psycopg2
 from psycopg2 import sql
 
-# ——— Logging Ayarları ———
+
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-# ——— DB Parametreleri (env’den) ———
-DB_PARAMS = {
-    'host':     os.getenv("DB_HOST"),
-    'dbname':   os.getenv("DB_NAME"),
-    'user':     os.getenv("DB_USER"),
-    'password': os.getenv("DB_PASSWORD"),
-    'port':     os.getenv("DB_PORT", "5432"),
-    'sslmode':  os.getenv("DB_SSLMODE", "require")
-}
+
+DB_HOST     = os.getenv("DBHOST")
+DB_NAME     = os.getenv("DBNAME")
+DB_USER     = os.getenv("DBUSER")
+DB_PASSWORD = os.getenv("DBPASSWORD")
+DB_PORT     = os.getenv("DBPORT", "5432")
+SSL_MODE    = os.getenv("DB_SSLMODE", "require")
 
 def get_db_connection():
-    return psycopg2.connect(**DB_PARAMS)
+    return psycopg2.connect(
+        host=DB_HOST,
+        database=DB_NAME,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        port=DB_PORT,
+        sslmode=SSL_MODE
+    )
 
 def lambda_handler(event, context):
     try:
         logger.info("Received event: %s", json.dumps(event))
 
-        # 1) Cognito sub’ı al
+
         claims      = event["requestContext"]["authorizer"]["jwt"]["claims"]
         cognito_sub = claims["sub"]
         logger.info("Cognito sub from token: %s", cognito_sub)
 
-        # 2) sub’a karşılık internal user_id’yi bulun
+
         conn = get_db_connection()
         try:
             with conn.cursor() as cur:
@@ -47,7 +52,7 @@ def lambda_handler(event, context):
                     }
                 internal_user_id = row[0]
 
-                # 3) Cihaz listesini sorgula
+
                 cur.execute(
                     """
                     SELECT
@@ -62,7 +67,7 @@ def lambda_handler(event, context):
                 )
                 devices = []
                 for device_id, updated_at, status in cur.fetchall():
-                    # status sütunu JSON ya da NULL olabilir
+
                     device = {
                         "deviceid":   device_id,
                         "updated_at": int(updated_at),
@@ -73,7 +78,7 @@ def lambda_handler(event, context):
         finally:
             conn.close()
 
-        # 4) Başarılı cevap
+
         return {
             "statusCode": 200,
             "body": json.dumps({"devices": devices}),

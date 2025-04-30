@@ -7,14 +7,14 @@ from datetime import datetime
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+print("Deployment test log")
 
-
-DB_HOST    = os.getenv("DB_HOST")
-DB_NAME    = os.getenv("DB_NAME")
-DB_USER    = os.getenv("DB_USER")
-DB_PASSWORD= os.getenv("DB_PASSWORD")
-DB_PORT    = os.getenv("DB_PORT", "5432")
-SSL_MODE   = os.getenv("DB_SSLMODE", "require")
+DB_HOST     = os.getenv("DBHOST")
+DB_NAME     = os.getenv("DBNAME")
+DB_USER     = os.getenv("DBUSER")
+DB_PASSWORD = os.getenv("DBPASSWORD")
+DB_PORT     = os.getenv("DBPORT", "5432")
+SSL_MODE    = os.getenv("DB_SSLMODE", "require")
 
 def get_db_connection():
     return psycopg2.connect(
