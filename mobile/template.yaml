@@ -1,0 +1,276 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  mobile
+
+
+
+Parameters:
+  Environment:
+    Type: String
+    Default: "development"
+  DBHOST:
+    Type: String
+  DBNAME:
+    Type: String
+  DBUSER:
+    Type: String
+  DBPASSWORD:
+    Type: String
+  REGION:
+    Type: String
+  COGNITOCLIENTID:
+    Type: String
+  COGNITOPOOLID:
+    Type: String
+
+
+Resources:
+  CognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub "${AWS::StackName}-UserPool"
+      AutoVerifiedAttributes: []
+      UsernameAttributes:
+        - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireUppercase: true
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: false
+
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub "${AWS::StackName}-UserPoolClient"
+      UserPoolId: !Ref CognitoUserPool
+      ExplicitAuthFlows:
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      GenerateSecret: false
+
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: $default
+      Auth:
+        Authorizers:
+          CognitoAuth:
+            IdentitySource: "$request.header.Authorization"
+            JwtConfiguration:
+              issuer: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}"
+              audience:
+                - !Ref CognitoUserPoolClient
+        DefaultAuthorizer: CognitoAuth
+      
+
+  SignUpFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/signup/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Timeout: 30
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - rds-db:connect
+              Resource: "*"
+      Environment:
+        Variables:
+          DBHOST: !Ref DBHOST
+          DBNAME: !Ref DBNAME
+          DBUSER: !Ref DBUSER
+          DBPASSWORD: !Ref DBPASSWORD
+          REGION: !Ref REGION
+          ENV: !Ref Environment
+          COGNITOCLIENTID: !Ref COGNITOCLIENTID
+          COGNITOPOOLID: !Ref COGNITOPOOLID
+      Events:
+        AddDevice:
+          Type: HttpApi
+          Properties:
+            Path: /user/signup
+            Method: post
+            ApiId: !Ref HttpApi
+            Auth:
+              Authorizer: NONE 
+
+  AddDeviceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/add-device/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Timeout: 15
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - rds-db:connect
+              Resource: "*"
+      Environment:
+        Variables:
+          DBHOST: !Ref DBHOST
+          DBNAME: !Ref DBNAME
+          DBUSER: !Ref DBUSER
+          DBPASSWORD: !Ref DBPASSWORD
+          REGION: !Ref REGION
+          ENV: !Ref Environment
+          COGNITOCLIENTID: !Ref COGNITOCLIENTID
+          COGNITOPOOLID: !Ref COGNITOPOOLID
+      Events:
+        AddDevice:
+          Type: HttpApi
+          Properties:
+            Path: /device/add
+            Method: post
+            ApiId: !Ref HttpApi
+            Auth:
+              Authorizer: CognitoAuth
+                       
+
+  ListDevicesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/list-devices/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Timeout: 30
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - rds-db:connect
+              Resource: "*"
+      Environment:
+        Variables:
+          DBHOST: !Ref DBHOST
+          DBNAME: !Ref DBNAME
+          DBUSER: !Ref DBUSER
+          DBPASSWORD: !Ref DBPASSWORD
+          REGION: !Ref REGION
+          ENV: !Ref Environment
+          COGNITOCLIENTID: !Ref COGNITOCLIENTID
+          COGNITOPOOLID: !Ref COGNITOPOOLID
+      Events:
+        ListDevices:
+          Type: HttpApi
+          Properties:
+            Path: /device/list
+            Method: get
+            ApiId: !Ref HttpApi
+            Auth:
+              Authorizer: CognitoAuth
+
+
+  DeleteDeviceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/delete-device/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Timeout: 15
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - rds-db:connect
+              Resource: "*"
+      Environment:
+        Variables:
+          DB_HOST: !Ref DBHOST
+          DB_NAME: !Ref DBNAME
+          DB_USER: !Ref DBUSER
+          DB_PASSWORD: !Ref DBPASSWORD
+          REGION: !Ref REGION
+          COGNITO_USER_POOL_ID: !Ref COGNITOPOOLID
+          COGNITO_APP_CLIENT_ID: !Ref COGNITOCLIENTID
+          ENV: !Ref Environment
+      Events:
+        DeleteDevice:
+          Type: HttpApi
+          Properties:
+            Path: /device/delete
+            Method: post
+            ApiId: !Ref HttpApi
+
+  GetDeviceStatusFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/get-device-status/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Timeout: 10
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - rds-db:connect
+              Resource: "*"
+      Environment:
+        Variables:
+          DBHOST: !Ref DBHOST
+          DBNAME: !Ref DBNAME
+          DBUSER: !Ref DBUSER
+          DBPASSWORD: !Ref DBPASSWORD
+          DBPORT: "5432"
+          REGION: !Ref REGION
+      Events:
+        GetDeviceStatus:
+          Type: HttpApi
+          Properties:
+            Path: /device/status
+            Method: get
+            ApiId: !Ref HttpApi
+            Auth:
+              Authorizer: CognitoAuth
+
+
+Outputs:
+  CognitoUserPoolId:
+    Description: "ID of the Cognito User Pool"
+    Value: !Ref CognitoUserPool
+
+  CognitoUserPoolClientId:
+    Description: "ID of the Cognito User Pool Client"
+    Value: !Ref CognitoUserPoolClient
+
+  AddDeviceApi:
+    Description: "API Gateway endpoint for POST /device/add"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/device/add"
+
+  ListDevicesApi:
+    Description: "API Gateway endpoint for GET /device/list"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/device/list"
+
+  SignUpFunctionApi:
+    Description: "API Gateway endpoint for POST /user/signup"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/user/signup"
+
+  DeleteDeviceApi:
+    Description: "API Gateway endpoint for POST /device/delete"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/device/delete"
+
+  GetDeviceStatusApi:
+    Description: "API Gateway endpoint for GET /device/status"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/device/status"
