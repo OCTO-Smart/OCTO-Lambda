@@ -19,12 +19,12 @@ Parameters:
     Type: String
 
 Resources:
- MyExistingHttpApi:
+  MyExistingHttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
       StageName: $default
 
- UpdateStatusFunction:
+  UpdateStatusFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: functions/update-status/
@@ -57,7 +57,42 @@ Resources:
             Path: /device/update-status
             Method: post
     Metadata:
-      DockerContext: .
+      DockerContext: ./functions/update-status
+      Dockerfile: Dockerfile
+
+  AddDeviceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/add-device/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Timeout: 30
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - rds-db:connect
+              Resource: "*"  # Gerekirse RDS ARN ile sınırla
+      Environment:
+        Variables:
+          DB_HOST: !Ref DBHOST
+          DB_NAME: !Ref DBNAME
+          DB_USER: !Ref DBUSER
+          DB_PASSWORD: !Ref DBPASSWORD
+          REGION: !Ref REGION
+          ENV: !Ref Environment
+      Events:
+        AddDevice:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref MyExistingHttpApi
+            Path: /device/add
+            Method: post
+    Metadata:
+      DockerContext: ./functions/add-device
       Dockerfile: Dockerfile
 
 Outputs:
@@ -65,3 +100,8 @@ Outputs:
     Description: "API Gateway endpoint for UpdateStatusFunction"
     Value:
       Fn::Sub: "https://${MyExistingHttpApi}.execute-api.${AWS::Region}.amazonaws.com/device/update-status"
+
+  AddDeviceApi:
+    Description: "API Gateway endpoint for AddDeviceFunction"
+    Value:
+      Fn::Sub: "https://${MyExistingHttpApi}.execute-api.${AWS::Region}.amazonaws.com/device/add"
