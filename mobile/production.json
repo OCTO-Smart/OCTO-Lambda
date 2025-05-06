@@ -5,8 +5,8 @@
     "DBUSER": "ivoc",
     "DBPASSWORD": "ivocDevDB!",
     "REGION": "eu-central-1",
-    "COGNITOPOOLID": "eu-central-1_sUAALVGPt",
-    "COGNITOCLIENTID": "5agpjlspqgev7d9blfacama607",
+    "COGNITOPOOLID": "eu-central-1_pVuzCYeHT",
+    "COGNITOCLIENTID": "3bcvlail2vkkc3mfis09eufqob",
     "ENV": "Development"
   },
   "SignUpFunction": {
@@ -15,8 +15,8 @@
     "DBUSER": "ivoc",
     "DBPASSWORD": "ivocDevDB!",
     "REGION": "eu-central-1",
-    "COGNITOPOOLID":"eu-central-1_sUAALVGPt",
-    "COGNITOCLIENTID":"5agpjlspqgev7d9blfacama607",
+    "COGNITOPOOLID":"eu-central-1_pVuzCYeHT",
+    "COGNITOCLIENTID":"3bcvlail2vkkc3mfis09eufqob",
     "ENV": "Development"
   },
   "ListDevicesFunction": {
@@ -25,8 +25,8 @@
     "DB_USER": "ivoc",
     "DB_PASSWORD": "ivocDevDB!",
     "REGION": "eu-central-1",
-    "COGNITO_USER_POOL_ID":"eu-central-1_sUAALVGPt",
-    "COGNITO_APP_CLIENT_ID":"5agpjlspqgev7d9blfacama607",
+    "COGNITO_USER_POOL_ID":"eu-central-1_pVuzCYeHT",
+    "COGNITO_APP_CLIENT_ID":"3bcvlail2vkkc3mfis09eufqob",
     "ENV": "Development"
   },
   "DeleteDeviceFunction":{
@@ -35,8 +35,8 @@
     "DB_USER": "ivoc",
     "DB_PASSWORD": "ivocDevDB!",
     "REGION": "eu-central-1",
-    "COGNITO_USER_POOL_ID":"eu-central-1_sUAALVGPt",
-    "COGNITO_APP_CLIENT_ID":"5agpjlspqgev7d9blfacama607",
+    "COGNITO_USER_POOL_ID":"eu-central-1_pVuzCYeHT",
+    "COGNITO_APP_CLIENT_ID":"3bcvlail2vkkc3mfis09eufqob",
     "ENV": "Development"
   },
   "GetDeviceStatusFunction":{
@@ -45,8 +45,8 @@
     "DB_USER": "ivoc",
     "DB_PASSWORD": "ivocDevDB!",
     "REGION": "eu-central-1",
-    "COGNITO_USER_POOL_ID":"eu-central-1_sUAALVGPt",
-    "COGNITO_APP_CLIENT_ID":"5agpjlspqgev7d9blfacama607",
+    "COGNITO_USER_POOL_ID":"eu-central-1_pVuzCYeHT",
+    "COGNITO_APP_CLIENT_ID":"3bcvlail2vkkc3mfis09eufqob",
     "ENV": "Development"
   },
   "ChangePasswordFunction":{
@@ -55,8 +55,8 @@
     "DB_USER": "ivoc",
     "DB_PASSWORD": "ivocDevDB!",
     "REGION": "eu-central-1",
-    "COGNITO_USER_POOL_ID":"eu-central-1_sUAALVGPt",
-    "COGNITO_APP_CLIENT_ID":"5agpjlspqgev7d9blfacama607",
+    "COGNITO_USER_POOL_ID":"eu-central-1_pVuzCYeHT",
+    "COGNITO_APP_CLIENT_ID":"3bcvlail2vkkc3mfis09eufqob",
     "ENV": "Development"
   },
   "DeviceUpdateFunction":{
@@ -65,8 +65,8 @@
     "DB_USER": "ivoc",
     "DB_PASSWORD": "ivocDevDB!",
     "REGION": "eu-central-1",
-    "COGNITO_USER_POOL_ID":"eu-central-1_sUAALVGPt",
-    "COGNITO_APP_CLIENT_ID":"5agpjlspqgev7d9blfacama607",
+    "COGNITO_USER_POOL_ID":"eu-central-1_pVuzCYeHT",
+    "COGNITO_APP_CLIENT_ID":"3bcvlail2vkkc3mfis09eufqob",
     "ENV": "Development"
   }
   

@@ -46,7 +46,8 @@ def lambda_handler(event, context):
             UserAttributes=[
                 {'Name': 'email', 'Value': email},
                 {'Name': 'given_name', 'Value': name},
-                {'Name': 'family_name', 'Value': lastname}
+                {'Name': 'family_name', 'Value': lastname},
+                {'Name': 'updated_at', 'Value': str(int(datetime.utcnow().timestamp()))}
             ]
         )
 

@@ -14,63 +14,50 @@ lint = true
 
 [default.deploy.parameters]
 capabilities = "CAPABILITY_IAM"
-confirm_changeset = true
+stack_name = "Mobile-Stack-Dev"
 resolve_s3 = true
 parameter_overrides = [
-  "DBHOST=ivocdev.cxiqcy2uo0c3.eu-central-1.rds.amazonaws.com",
+  "DBHOST=ivocdev.c7k4ca408qit.eu-west-1.rds.amazonaws.com",
   "DBNAME=ivocdev",
   "DBUSER=ivoc",
   "DBPASSWORD=ivocDevDB!",
-  "REGION=eu-central-1",
-  "COGNITOPOOLID=eu-central-1_sUAALVGPt",
-  "COGNITOCLIENTID=5agpjlspqgev7d9blfacama607",
+  "REGION=eu-west-1",
+  "COGNITOPOOLID=eu-west-1_FDrPzUvv1",
+  "COGNITOCLIENTID=19qsr1bknsnmotkb40kqn88llr",
 ]
 [default.package.parameters]
 resolve_s3 = true
 
 [dev.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
 stack_name = "Mobile-Stack-Dev"
 region = "eu-west-1"
+resolve_s3 = true
 parameter_overrides = [
-  "DBHOST=ivocdev.cxiqcy2uo0c3.eu-central-1.rds.amazonaws.com",
+  "DBHOST=ivocdev.c7k4ca408qit.eu-west-1.rds.amazonaws.com",
   "DBNAME=ivocdev",
   "DBUSER=ivoc",
   "DBPASSWORD=ivocDevDB!",
-  "REGION=eu-central-1",
-  "COGNITOPOOLID=eu-central-1_sUAALVGPt",
-  "COGNITOCLIENTID=5agpjlspqgev7d9blfacama607",
+  "REGION=eu-west-1",
+  "COGNITOPOOLID=eu-west-1_FDrPzUvv1",
+  "COGNITOCLIENTID=19qsr1bknsnmotkb40kqn88llr",
 ]
 
 [prod.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
 stack_name = "Mobile-Stack-Prod"
 region = "eu-central-1"
-parameter_overrides = [
-  "DBHOST=ivocdev.cxiqcy2uo0c3.eu-central-1.rds.amazonaws.com",
-  --"DBNAME=ivocdev",
-  "DBUSER=ivoc",
-  "DBPASSWORD=ivocDevDB!",
-  "REGION=eu-central-1",
-  --"COGNITOPOOLID=eu-central-1_sUAALVGPt",
-  --"COGNITOCLIENTID=5agpjlspqgev7d9blfacama607",
-]
-
-
-
-[default.deploy.parameters]
-capabilities = "CAPABILITY_IAM"
-confirm_changeset = true
 resolve_s3 = true
+confirm_changeset = true
 parameter_overrides = [
   "DBHOST=ivocdev.cxiqcy2uo0c3.eu-central-1.rds.amazonaws.com",
   "DBNAME=ivocdev",
   "DBUSER=ivoc",
   "DBPASSWORD=ivocDevDB!",
   "REGION=eu-central-1",
-  "COGNITOPOOLID=eu-central-1_sUAALVGPt",
-  "COGNITOCLIENTID=5agpjlspqgev7d9blfacama607",
+  "COGNITOPOOLID=eu-central-1_pVuzCYeHT",
+  "COGNITOCLIENTID=3bcvlail2vkkc3mfis09eufqob",
 ]
-[default.package.parameters]
-resolve_s3 = true
 
 [default.sync.parameters]
 watch = true
