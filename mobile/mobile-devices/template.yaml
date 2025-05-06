@@ -1,22 +1,31 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: >
-  mobile-devices
+Description: mobile-devices stack - Deployable Version
 
 Parameters:
   Environment:
     Type: String
-    Default: "development"
+    Default: development
+
   DBHOST:
     Type: String
+    Description: Database Host (RDS Endpoint)
+
   DBNAME:
     Type: String
+    Description: Database Name
+
   DBUSER:
     Type: String
+    Description: Database Username
+
   DBPASSWORD:
     Type: String
+    Description: Database Password
+
   REGION:
     Type: String
+    Description: AWS Region
 
 Resources:
   HttpApi:
@@ -24,7 +33,7 @@ Resources:
     Properties:
       StageName: $default
 
-  AddDeviceFunction:
+  DeviceFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: functions/add-device/
@@ -32,7 +41,8 @@ Resources:
       Runtime: python3.12
       Architectures:
         - x86_64
-      Timeout: 30
+      Timeout: 31
+      Description: mobile-devices stack - Deployable Version (updated)
       Policies:
         - Version: '2012-10-17'
           Statement:
@@ -55,8 +65,18 @@ Resources:
             Path: /device/add
             Method: post
             ApiId: !Ref HttpApi
+        ListDevices:
+          Type: HttpApi
+          Properties:
+            Path: /device/list
+            Method: get
+            ApiId: !Ref HttpApi
 
 Outputs:
   AddDeviceApi:
-    Description: "API Gateway endpoint for AddDeviceFunction"
+    Description: "API Gateway endpoint for POST /device/add"
     Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/device/add"
+
+  ListDevicesApi:
+    Description: "API Gateway endpoint for GET /device/list"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/device/list"

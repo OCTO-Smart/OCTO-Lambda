@@ -7,6 +7,6 @@ architecture = "x86_64"
 handler = "app.lambda_handler"
 manifest_hash = "6d15f99ff35ef6ed352a0f81ed5b2f65"
 packagetype = "Zip"
-functions = ["AddDeviceFunction"]
+functions = ["DeviceFunction"]
 
 [layer_build_definitions]

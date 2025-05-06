@@ -1,5 +1,3 @@
-# More information about the configuration file can be found here:
-# https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-config.html
 version = 0.1
 
 [default.global.parameters]
@@ -16,6 +14,13 @@ lint = true
 capabilities = "CAPABILITY_IAM"
 confirm_changeset = true
 resolve_s3 = true
+parameter_overrides = [
+  "DBHOST=ivocdev.cxiqcy2uo0c3.eu-central-1.rds.amazonaws.com",
+  "DBNAME=ivocdev",
+  "DBUSER=ivoc",
+  "DBPASSWORD=ivocDevDB!",
+  "REGION=eu-central-1"
+]
 
 [default.package.parameters]
 resolve_s3 = true
