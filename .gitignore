@@ -1,4 +1,4 @@
 
 .DS_Store
 device/.aws-sam/
-/mobile/mobile/.aws-sam/
+mobile/.aws-sam/

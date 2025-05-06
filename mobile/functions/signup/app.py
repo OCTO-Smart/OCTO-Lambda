@@ -10,9 +10,7 @@ USER_POOL_ID = os.getenv("COGNITOPOOLID")
 CLIENT_ID    = os.getenv("COGNITOCLIENTID")
 REGION       = os.getenv("REGION")
 
-#cognito = boto3.client(CLIENT_ID, region_name=REGION)
 cognito = boto3.client("cognito-idp", region_name=REGION)
-
 
 DB_PARAMS = {
     'host':     os.getenv('DBHOST'),
@@ -21,14 +19,6 @@ DB_PARAMS = {
     'password': os.getenv('DBPASSWORD'),
     'port':     os.getenv('DBPORT', '5432')
 }
-
-
-# def validate_db_params():
-#     missing = [k for k, v in DB_PARAMS.items() if not v]
-#     if missing:
-#         print(f"Error: Missing DB params: {missing}")
-#         return False
-#     return True
 
 
 def lambda_handler(event, context):
@@ -43,13 +33,12 @@ def lambda_handler(event, context):
         else:
             data = event
 
-        
         email     = data.get('email')
         name      = data.get('name')
         lastname  = data.get('lastname')
         password  = data.get('password')
 
-        # Step 1: Signup to Cognito
+
         signup_response = cognito.sign_up(
             ClientId=CLIENT_ID,
             Username=email,
@@ -61,10 +50,22 @@ def lambda_handler(event, context):
             ]
         )
 
-        # Step 2: Auto-confirm the user
+
         cognito.admin_confirm_sign_up(
             UserPoolId=USER_POOL_ID,
             Username=email
+        )
+
+
+        cognito.admin_update_user_attributes(
+            UserPoolId=USER_POOL_ID,
+            Username=email,
+            UserAttributes=[
+                {
+                    'Name': 'email_verified',
+                    'Value': 'true'
+                }
+            ]
         )
 
         user_sub = signup_response['UserSub']

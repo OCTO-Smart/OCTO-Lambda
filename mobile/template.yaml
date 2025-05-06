@@ -81,8 +81,16 @@ Resources:
           Statement:
             - Effect: Allow
               Action:
+               - cognito-idp:AdminConfirmSignUp
+               - cognito-idp:AdminUpdateUserAttributes
+               - cognito-idp:SignUp
+              Resource: "*"
+            - Effect: Allow
+              Action:
                 - rds-db:connect
               Resource: "*"
+
+
       Environment:
         Variables:
           DBHOST: !Ref DBHOST
@@ -94,7 +102,7 @@ Resources:
           COGNITOCLIENTID: !Ref COGNITOCLIENTID
           COGNITOPOOLID: !Ref COGNITOPOOLID
       Events:
-        AddDevice:
+        SignUp:
           Type: HttpApi
           Properties:
             Path: /user/signup
@@ -245,6 +253,154 @@ Resources:
             Auth:
               Authorizer: CognitoAuth
 
+  ForgotPasswordFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/forgot-password/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Timeout: 10
+      Environment:
+        Variables:
+          REGION: !Ref REGION
+          COGNITOCLIENTID: !Ref COGNITOCLIENTID
+      Events:
+        ForgotPassword:
+          Type: HttpApi
+          Properties:
+            Path: /user/forgot-password
+            Method: post
+            ApiId: !Ref HttpApi
+            Auth:
+              Authorizer: NONE
+
+
+  ConfirmForgotPasswordFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/confirm-forgot-password/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Timeout: 10
+      Environment:
+        Variables:
+          COGNITOCLIENTID: !Ref COGNITOCLIENTID
+          REGION: !Ref REGION
+      Events:
+        ConfirmForgotPassword:
+          Type: HttpApi
+          Properties:
+            Path: /user/confirm-forgot-password
+            Method: post
+            ApiId: !Ref HttpApi
+            Auth:
+              Authorizer: NONE
+
+
+
+  UpdateUserProfileFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/update-user/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Timeout: 15
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - rds-db:connect
+              Resource: "*"
+      Environment:
+        Variables:
+          DBHOST: !Ref DBHOST
+          DBNAME: !Ref DBNAME
+          DBUSER: !Ref DBUSER
+          DBPASSWORD: !Ref DBPASSWORD
+          DBPORT: "5432"
+          REGION: !Ref REGION
+          COGNITOCLIENTID: !Ref COGNITOCLIENTID
+          COGNITOPOOLID: !Ref COGNITOPOOLID
+      Events:
+        UpdateUserProfile:
+          Type: HttpApi
+          Properties:
+            Path: /user/update
+            Method: post
+            ApiId: !Ref HttpApi
+            Auth:
+              Authorizer: CognitoAuth
+
+  ChangePasswordFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/change-password/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Timeout: 15
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action:
+                - cognito-idp:ChangePassword
+              Resource: "*"
+      Environment:
+        Variables:
+          REGION: !Ref REGION
+      Events:
+        ChangePassword:
+          Type: HttpApi
+          Properties:
+            Path: /user/change-password
+            Method: post
+            ApiId: !Ref HttpApi
+            Auth:
+              Authorizer: CognitoAuth
+
+
+  DeviceUpdateFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/device-update/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Timeout: 15
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - rds-db:connect
+              Resource: "*"
+      Environment:
+        Variables:
+          DBHOST: !Ref DBHOST
+          DBNAME: !Ref DBNAME
+          DBUSER: !Ref DBUSER
+          DBPASSWORD: !Ref DBPASSWORD
+          DBPORT: "5432"
+          REGION: !Ref REGION
+      Events:
+        DeviceUpdate:
+          Type: HttpApi
+          Properties:
+            Path: /device/update
+            Method: post
+            ApiId: !Ref HttpApi
+            Auth:
+              Authorizer: CognitoAuth
+
 
 Outputs:
   CognitoUserPoolId:
@@ -274,3 +430,25 @@ Outputs:
   GetDeviceStatusApi:
     Description: "API Gateway endpoint for GET /device/status"
     Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/device/status"
+
+  ForgotPasswordApi:
+    Description: "API Gateway endpoint for POST /user/forgot-password"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/user/forgot-password"
+
+  ConfirmForgotPasswordApi:
+    Description: "API Gateway endpoint for POST /user/confirm-forgot-password"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/user/confirm-forgot-password"
+
+  UpdateUserProfileApi:
+    Description: "API Gateway endpoint for POST /user/update"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/user/update"
+
+  ChangePasswordApi:
+    Description: "API Gateway endpoint for POST /user/change-password"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/user/change-password"
+
+  DeviceUpdateApi:
+    Description: "API Gateway endpoint for POST /device/update"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/device/update"
+
+
