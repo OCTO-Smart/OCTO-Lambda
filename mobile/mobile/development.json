@@ -9,7 +9,6 @@
     "COGNITOCLIENTID": "5agpjlspqgev7d9blfacama607",
     "ENV": "Development"
   },
-
   "SignUpFunction": {
     "DBHOST": "ivocdev.cxiqcy2uo0c3.eu-central-1.rds.amazonaws.com",
     "DBNAME": "ivocdev",

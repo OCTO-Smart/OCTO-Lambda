@@ -1,7 +1,4 @@
 
 .DS_Store
-device/.aws-sam/build/
-device/.aws-sam/deps/
-device/.aws-sam/cache/
-device/.aws-sam/build.toml
-/mobile/mobile/.aws-sam/deps
+device/.aws-sam/
+/mobile/mobile/.aws-sam/
