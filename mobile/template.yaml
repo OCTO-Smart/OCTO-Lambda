@@ -3,8 +3,6 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   mobile
 
-
-
 Parameters:
   Environment:
     Type: String
@@ -23,7 +21,6 @@ Parameters:
     Type: String
   COGNITOPOOLID:
     Type: String
-
 
 Resources:
   CognitoUserPool:
@@ -61,9 +58,9 @@ Resources:
           CognitoAuth:
             IdentitySource: "$request.header.Authorization"
             JwtConfiguration:
-              issuer: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${CognitoUserPool}"
+              issuer: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${COGNITOPOOLID}"
               audience:
-                - !Ref CognitoUserPoolClient
+                - !Ref COGNITOCLIENTID
         DefaultAuthorizer: CognitoAuth
       
 
