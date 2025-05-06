@@ -74,4 +74,22 @@ manifest_hash = "ffdd2fc6d93cd6aed2b56771419c5194"
 packagetype = "Zip"
 functions = ["UpdateUserProfileFunction"]
 
+[function_build_definitions.3662f885-c757-4b57-af0b-ec0766c3753e]
+codeuri = "C:\\Users\\Mert\\Documents\\OCTO-Lambda\\mobile\\mobile\\functions\\change-password"
+runtime = "python3.12"
+architecture = "x86_64"
+handler = "app.lambda_handler"
+manifest_hash = "30a77242227a85a29c98942a2208d62a"
+packagetype = "Zip"
+functions = ["ChangePasswordFunction"]
+
+[function_build_definitions.20f1af80-2834-45cb-ada8-0642e78d54d3]
+codeuri = "C:\\Users\\Mert\\Documents\\OCTO-Lambda\\mobile\\mobile\\functions\\device-update"
+runtime = "python3.12"
+architecture = "x86_64"
+handler = "app.lambda_handler"
+manifest_hash = "ffdd2fc6d93cd6aed2b56771419c5194"
+packagetype = "Zip"
+functions = ["DeviceUpdateFunction"]
+
 [layer_build_definitions]

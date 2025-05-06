@@ -49,6 +49,26 @@
     "COGNITO_USER_POOL_ID":"eu-central-1_sUAALVGPt",
     "COGNITO_APP_CLIENT_ID":"5agpjlspqgev7d9blfacama607",
     "ENV": "Development"
+  },
+  "ChangePasswordFunction":{
+    "DB_HOST": "ivocdev.cxiqcy2uo0c3.eu-central-1.rds.amazonaws.com",
+    "DB_NAME": "ivocdev",
+    "DB_USER": "ivoc",
+    "DB_PASSWORD": "ivocDevDB!",
+    "REGION": "eu-central-1",
+    "COGNITO_USER_POOL_ID":"eu-central-1_sUAALVGPt",
+    "COGNITO_APP_CLIENT_ID":"5agpjlspqgev7d9blfacama607",
+    "ENV": "Development"
+  },
+  "DeviceUpdateFunction":{
+    "DB_HOST": "ivocdev.cxiqcy2uo0c3.eu-central-1.rds.amazonaws.com",
+    "DB_NAME": "ivocdev",
+    "DB_USER": "ivoc",
+    "DB_PASSWORD": "ivocDevDB!",
+    "REGION": "eu-central-1",
+    "COGNITO_USER_POOL_ID":"eu-central-1_sUAALVGPt",
+    "COGNITO_APP_CLIENT_ID":"5agpjlspqgev7d9blfacama607",
+    "ENV": "Development"
   }
-
+  
 }

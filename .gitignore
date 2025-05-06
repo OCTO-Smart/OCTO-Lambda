@@ -4,3 +4,4 @@ device/.aws-sam/build/
 device/.aws-sam/deps/
 
 device/.aws-sam/build.toml
+/mobile/mobile/.aws-sam/deps

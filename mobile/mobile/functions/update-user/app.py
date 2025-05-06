@@ -16,7 +16,7 @@ DB_PARAMS = {
     'port':     os.getenv('DBPORT', '5432')
 }
 
-ALLOWED_FIELDS = ['name', 'lastname', 'email', 'device_name']
+ALLOWED_FIELDS = ['name', 'lastname']
 
 def get_db_connection():
     return psycopg2.connect(**DB_PARAMS)
@@ -37,10 +37,9 @@ def lambda_handler(event, context):
                 "headers": {"Content-Type": "application/json"}
             }
 
-        # Add updated_at field
+
         fields_to_update['updated_at'] = datetime.utcnow()
 
-        # Build dynamic SET clause
         set_clauses = [sql.SQL("{} = %s").format(sql.Identifier(k)) for k in fields_to_update]
         values = list(fields_to_update.values())
 
