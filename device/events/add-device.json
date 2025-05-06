@@ -1,4 +1,4 @@
 {
-    "body": "{\"userid\": 1, \"devicename\": \"Sensor A\", \"serial\": \"SN02022\", \"type\": 1}"
+    "body": "{ \"devicename\": \"Sensor 3\", \"serial\": \"SN02022\", \"type\": \"1\" }"
   }
   

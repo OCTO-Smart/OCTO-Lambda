@@ -81,6 +81,7 @@ def lambda_handler(event, context):
         print("Device ID found:", device_id)
 
         if not device_id:
+            #TODO: Cihaz DB'ye kayıtlı değilse, device projesindeki add device ile eklenecek.
             raise Exception(f"Device '{device_name}' not found in devices table")
 
         logger.info("Step 11: Updating device_status in database...")

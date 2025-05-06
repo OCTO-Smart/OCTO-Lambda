@@ -13,7 +13,6 @@ DB_HOST     = os.getenv("DB_HOST")
 DB_NAME     = os.getenv("DB_NAME")
 DB_USER     = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_PORT     = int(os.getenv("DB_PORT"))
 SSL_MODE    = os.getenv("DB_SSLMODE")
 
 def lambda_handler(event, context):
@@ -23,19 +22,18 @@ def lambda_handler(event, context):
         body = event.get("body", event)
         data = json.loads(body) if isinstance(body, str) else body
 
-        user_id     = data["userid"]
         device_name = data["devicename"]
         serial      = data["serial"]
         device_type       = data["type"]
 
-        logging.info("Attempting to add or lookup device: serial=%s, name=%s, type=%s for user=%s", serial, device_name, device_type, user_id)
+        logging.info("Attempting to add or lookup device: serial=%s, name=%s, type=%s for user=%s", serial, device_name, device_type )
 
         conn = psycopg2.connect(
             host=DB_HOST,
             database=DB_NAME,
             user=DB_USER,
             password=DB_PASSWORD,
-            port=DB_PORT,
+            port=5432,
             sslmode=SSL_MODE
         )
         cur = conn.cursor()
@@ -55,22 +53,6 @@ def lambda_handler(event, context):
             device_id = cur.fetchone()[0]
             conn.commit()
             logging.info("Inserted new device id=%s", device_id)
-
-        cur.execute(
-            "SELECT 1 FROM user_devices WHERE user_id = %s AND device_id = %s",
-            (user_id, device_id)
-        )
-        if cur.fetchone():
-            logging.info("User-device mapping already exists for user=%s, device=%s", user_id, device_id)
-        else:
-            logging.info("Creating user-device mapping")
-            created_at = datetime.utcnow()
-            cur.execute(
-                "INSERT INTO user_devices (user_id, device_id, created_at) VALUES (%s, %s, %s)",
-                (user_id, device_id, created_at)
-            )
-            conn.commit()
-            logging.info("Inserted user-device mapping for user=%s, device=%s", user_id, device_id)
 
         cur.close()
         conn.close()
