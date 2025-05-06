@@ -1,0 +1,98 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  mobile
+
+Parameters:
+  Environment:
+    Type: String
+    Default: "development"
+  DBHOST:
+    Type: String
+  DBNAME:
+    Type: String
+  DBUSER:
+    Type: String
+  DBPASSWORD:
+    Type: String
+  REGION:
+    Type: String
+
+Resources:
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: $default
+
+  AddDeviceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/add-device/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Timeout: 30
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - rds-db:connect
+              Resource: "*"
+      Environment:
+        Variables:
+          DB_HOST: !Ref DBHOST
+          DB_NAME: !Ref DBNAME
+          DB_USER: !Ref DBUSER
+          DB_PASSWORD: !Ref DBPASSWORD
+          REGION: !Ref REGION
+          ENV: !Ref Environment
+      Events:
+        AddDevice:
+          Type: HttpApi
+          Properties:
+            Path: /device/add
+            Method: post
+            ApiId: !Ref HttpApi
+
+  ListDevicesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/list-devices/
+      Handler: app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Timeout: 30
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - rds-db:connect
+              Resource: "*"
+      Environment:
+        Variables:
+          DB_HOST: !Ref DBHOST
+          DB_NAME: !Ref DBNAME
+          DB_USER: !Ref DBUSER
+          DB_PASSWORD: !Ref DBPASSWORD
+          REGION: !Ref REGION
+          ENV: !Ref Environment
+      Events:
+        ListDevices:
+          Type: HttpApi
+          Properties:
+            Path: /device/list
+            Method: get
+            ApiId: !Ref HttpApi
+
+Outputs:
+  AddDeviceApi:
+    Description: "API Gateway endpoint for POST /device/add"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/device/add"
+
+  ListDevicesApi:
+    Description: "API Gateway endpoint for GET /device/list"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/device/list"
