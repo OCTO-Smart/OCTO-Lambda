@@ -1,0 +1,20 @@
+{
+    "sqltools.connections": [
+        {
+            "pgOptions": {
+                "ssl": {
+                    "rejectUnauthorized": true,
+                    "ca": "C:\\Users\\Mert\\Desktop\\global-bundle.pem"
+                }
+            },
+            "previewLimit": 50,
+            "server": "ivocdev.c7k4ca408qit.eu-west-1.rds.amazonaws.com",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "ivoc",
+            "database": "ivocdb",
+            "username": "ivoc",
+            "password": "ivocDB!"
+        }
+    ]
+}
