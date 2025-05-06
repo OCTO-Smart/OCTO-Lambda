@@ -2,68 +2,83 @@ import os
 import json
 import logging
 import psycopg2
+from psycopg2 import sql
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(message)s"
-)
 
-DB_HOST = os.getenv("DB_HOST")
-DB_NAME = os.getenv("DB_NAME")
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_PORT = int(os.getenv("DB_PORT", "5432"))
-SSL_MODE = os.getenv("DB_SSLMODE", "require")
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+
+DB_HOST     = os.getenv("DBHOST")
+DB_NAME     = os.getenv("DBNAME")
+DB_USER     = os.getenv("DBUSER")
+DB_PASSWORD = os.getenv("DBPASSWORD")
+DB_PORT     = os.getenv("DBPORT", "5432")
+SSL_MODE    = os.getenv("DB_SSLMODE", "require")
+
+def get_db_connection():
+    return psycopg2.connect(
+        host=DB_HOST,
+        database=DB_NAME,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        port=DB_PORT,
+        sslmode=SSL_MODE
+    )
 
 def lambda_handler(event, context):
     try:
-        logging.info("Received event: %s", json.dumps(event))
+        logger.info("Received event: %s", json.dumps(event))
 
-        params = event.get("queryStringParameters", {})
-        user_id = params.get("userid")
 
-        if not user_id:
-            raise Exception("Missing userid parameter in query string.")
+        claims      = event["requestContext"]["authorizer"]["jwt"]["claims"]
+        cognito_sub = claims["sub"]
+        logger.info("Cognito sub from token: %s", cognito_sub)
 
-        conn = psycopg2.connect(
-            host=DB_HOST,
-            database=DB_NAME,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            port=DB_PORT,
-            sslmode=SSL_MODE
-        )
-        cur = conn.cursor()
 
-        cur.execute(
-            """
-            SELECT
-                ud.device_id,
-                EXTRACT(EPOCH FROM ud.updated_at)::BIGINT AS updated_at,
-                ds.status
-            FROM
-                user_devices ud
-            LEFT JOIN
-                device_status ds
-            ON
-                ud.device_id = ds.device_id
-            WHERE
-                ud.user_id = %s
-            """,
-            (user_id,)
-        )
+        conn = get_db_connection()
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    sql.SQL('SELECT id FROM "user" WHERE cognito_sub = %s'),
+                    (cognito_sub,)
+                )
+                row = cur.fetchone()
+                if not row:
+                    return {
+                        "statusCode": 403,
+                        "body": json.dumps({"message": "User not found"}),
+                        "headers": {"Content-Type": "application/json"}
+                    }
+                internal_user_id = row[0]
 
-        devices = []
-        for row in cur.fetchall():
-            device = {
-                "deviceid": row[0],
-                "updated_at": row[1],
-                "status": row[2] if isinstance(row[2], dict) else json.loads(row[2]) if row[2] else {}
-            }
-            devices.append(device)
 
-        cur.close()
-        conn.close()
+                cur.execute(
+                    """
+                    SELECT
+                      ud.device_id,
+                      EXTRACT(EPOCH FROM ud.updated_at)::BIGINT AS updated_at,
+                      ds.status
+                    FROM user_devices ud
+                    LEFT JOIN device d ON ud.device_id = d.id
+                    LEFT JOIN device_status ds ON ud.device_id = ds.device_id
+                    WHERE ud.user_id = %s AND d.is_active = TRUE
+                    """,
+                    (internal_user_id,)
+                )
+                devices = []
+                for device_id, updated_at, status in cur.fetchall():
+
+                    device = {
+                        "deviceid":   device_id,
+                        "updated_at": int(updated_at),
+                        "status":     status if isinstance(status, dict)
+                                      else (json.loads(status) if status else {})
+                    }
+                    devices.append(device)
+        finally:
+            conn.close()
+
 
         return {
             "statusCode": 200,
@@ -72,7 +87,7 @@ def lambda_handler(event, context):
         }
 
     except Exception as e:
-        logging.error("Error in Lambda Function: %s", str(e), exc_info=True)
+        logger.error("Error in ListDevices Lambda Function: %s", str(e), exc_info=True)
         return {
             "statusCode": 500,
             "body": json.dumps({"error": str(e)}),

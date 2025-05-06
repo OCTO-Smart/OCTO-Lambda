@@ -6,7 +6,7 @@ runtime = "python3.12"
 architecture = "x86_64"
 handler = "app.lambda_handler"
 source_hash = "fe700c08d51d1e66498bd7c68f3b9d9080e6f0f345a702dad8fc077212aea599"
-manifest_hash = "6d15f99ff35ef6ed352a0f81ed5b2f65"
+manifest_hash = "30a77242227a85a29c98942a2208d62a"
 packagetype = "Zip"
 functions = ["AddDeviceFunction"]
 
@@ -16,8 +16,80 @@ runtime = "python3.12"
 architecture = "x86_64"
 handler = "app.lambda_handler"
 source_hash = "42bbc94230594a2c004b1bd8aeae459862a5f6e0fd711a5b70096de014cea616"
-manifest_hash = "6d15f99ff35ef6ed352a0f81ed5b2f65"
+manifest_hash = "30a77242227a85a29c98942a2208d62a"
 packagetype = "Zip"
 functions = ["ListDevicesFunction"]
+
+[function_build_definitions.2e9a591e-a7ac-46ed-b760-3f2174cd711d]
+codeuri = "C:\\Users\\Mert\\Documents\\OCTO-Lambda\\mobile\\mobile\\functions\\signup"
+runtime = "python3.12"
+architecture = "x86_64"
+handler = "app.lambda_handler"
+manifest_hash = "ffdd2fc6d93cd6aed2b56771419c5194"
+packagetype = "Zip"
+functions = ["SignUpFunction"]
+
+[function_build_definitions.9ef8f591-d134-47e8-be21-892530980598]
+codeuri = "C:\\Users\\Mert\\Documents\\OCTO-Lambda\\mobile\\mobile\\functions\\delete-device"
+runtime = "python3.12"
+architecture = "x86_64"
+handler = "app.lambda_handler"
+manifest_hash = "6d15f99ff35ef6ed352a0f81ed5b2f65"
+packagetype = "Zip"
+functions = ["DeleteDeviceFunction"]
+
+[function_build_definitions.d8ec9c48-65d1-48a4-af12-9325b6a1962b]
+codeuri = "C:\\Users\\Mert\\Documents\\OCTO-Lambda\\mobile\\mobile\\functions\\get-device-status"
+runtime = "python3.12"
+architecture = "x86_64"
+handler = "app.lambda_handler"
+manifest_hash = "6d15f99ff35ef6ed352a0f81ed5b2f65"
+packagetype = "Zip"
+functions = ["GetDeviceStatusFunction"]
+
+[function_build_definitions.62fec7e0-d9ad-44dc-b70a-02fb9e92e8c9]
+codeuri = "C:\\Users\\Mert\\Documents\\OCTO-Lambda\\mobile\\mobile\\functions\\forgot-password"
+runtime = "python3.12"
+architecture = "x86_64"
+handler = "app.lambda_handler"
+manifest_hash = "6d15f99ff35ef6ed352a0f81ed5b2f65"
+packagetype = "Zip"
+functions = ["ForgotPasswordFunction"]
+
+[function_build_definitions.c6fa0546-f9a2-456d-8b49-8240a7986226]
+codeuri = "C:\\Users\\Mert\\Documents\\OCTO-Lambda\\mobile\\mobile\\functions\\confirm-forgot-password"
+runtime = "python3.12"
+architecture = "x86_64"
+handler = "app.lambda_handler"
+manifest_hash = "6d15f99ff35ef6ed352a0f81ed5b2f65"
+packagetype = "Zip"
+functions = ["ConfirmForgotPasswordFunction"]
+
+[function_build_definitions.8fe5de36-3407-49ef-829c-435e3f1b3069]
+codeuri = "C:\\Users\\Mert\\Documents\\OCTO-Lambda\\mobile\\mobile\\functions\\update-user"
+runtime = "python3.12"
+architecture = "x86_64"
+handler = "app.lambda_handler"
+manifest_hash = "ffdd2fc6d93cd6aed2b56771419c5194"
+packagetype = "Zip"
+functions = ["UpdateUserProfileFunction"]
+
+[function_build_definitions.3662f885-c757-4b57-af0b-ec0766c3753e]
+codeuri = "C:\\Users\\Mert\\Documents\\OCTO-Lambda\\mobile\\mobile\\functions\\change-password"
+runtime = "python3.12"
+architecture = "x86_64"
+handler = "app.lambda_handler"
+manifest_hash = "30a77242227a85a29c98942a2208d62a"
+packagetype = "Zip"
+functions = ["ChangePasswordFunction"]
+
+[function_build_definitions.20f1af80-2834-45cb-ada8-0642e78d54d3]
+codeuri = "C:\\Users\\Mert\\Documents\\OCTO-Lambda\\mobile\\mobile\\functions\\device-update"
+runtime = "python3.12"
+architecture = "x86_64"
+handler = "app.lambda_handler"
+manifest_hash = "ffdd2fc6d93cd6aed2b56771419c5194"
+packagetype = "Zip"
+functions = ["DeviceUpdateFunction"]
 
 [layer_build_definitions]
