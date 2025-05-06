@@ -56,7 +56,7 @@ parameter_overrides = [
   "DBPASSWORD=ivocDevDB!",
   "REGION=eu-central-1",
   "COGNITOPOOLID=eu-central-1_pVuzCYeHT",
-  "COGNITOCLIENTID=3bcvlail2vkkc3mfis09eufqob",
+  "COGNITOCLIENTID=6rneg6g6c6v4eakeru65v6rm8k",
 ]
 
 [default.sync.parameters]
