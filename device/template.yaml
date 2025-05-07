@@ -1,7 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: >
-  device
+Description: device
 
 Parameters:
   Environment:
@@ -30,8 +29,6 @@ Resources:
       CodeUri: functions/update-status/
       Handler: app.lambda_handler
       Runtime: python3.12
-      Architectures:
-        - x86_64
       Timeout: 30
       Policies:
         - Version: '2012-10-17'
@@ -39,16 +36,20 @@ Resources:
             - Effect: Allow
               Action:
                 - s3:PutObject
+                - lambda:InvokeFunction
               Resource:
                 - arn:aws:s3:::ivocdevices/*
+                # AddDeviceFunction'ın **tam ARN**’sini buraya ekliyoruz:
+                - !GetAtt AddDeviceFunction.Arn
       Environment:
         Variables:
-          DB_HOST: !Ref DBHOST
-          DB_NAME: !Ref DBNAME
-          DB_USER: !Ref DBUSER
-          DB_PASSWORD: !Ref DBPASSWORD
-          REGION: !Ref REGION
-          ENV: !Ref Environment
+          DB_HOST:        !Ref DBHOST
+          DB_NAME:        !Ref DBNAME
+          DB_USER:        !Ref DBUSER
+          DB_PASSWORD:    !Ref DBPASSWORD
+          REGION:         !Ref REGION
+          ENV:            !Ref Environment
+          ADD_DEVICE_FUNCTION_NAME: !Ref AddDeviceFunction
       Events:
         UpdateStatus:
           Type: HttpApi
@@ -56,9 +57,6 @@ Resources:
             ApiId: !Ref MyExistingHttpApi
             Path: /device/update-status
             Method: post
-    Metadata:
-      DockerContext: ./functions/update-status
-      Dockerfile: Dockerfile
 
   AddDeviceFunction:
     Type: AWS::Serverless::Function
@@ -66,8 +64,6 @@ Resources:
       CodeUri: functions/add-device/
       Handler: app.lambda_handler
       Runtime: python3.12
-      Architectures:
-        - x86_64
       Timeout: 30
       Policies:
         - Version: '2012-10-17'
@@ -75,15 +71,15 @@ Resources:
             - Effect: Allow
               Action:
                 - rds-db:connect
-              Resource: "*"  # Gerekirse RDS ARN ile sınırla
+              Resource: "*" 
       Environment:
         Variables:
-          DB_HOST: !Ref DBHOST
-          DB_NAME: !Ref DBNAME
-          DB_USER: !Ref DBUSER
+          DB_HOST:     !Ref DBHOST
+          DB_NAME:     !Ref DBNAME
+          DB_USER:     !Ref DBUSER
           DB_PASSWORD: !Ref DBPASSWORD
-          REGION: !Ref REGION
-          ENV: !Ref Environment
+          REGION:      !Ref REGION
+          ENV:         !Ref Environment
       Events:
         AddDevice:
           Type: HttpApi
@@ -91,17 +87,12 @@ Resources:
             ApiId: !Ref MyExistingHttpApi
             Path: /device/add
             Method: post
-    Metadata:
-      DockerContext: ./functions/add-device
-      Dockerfile: Dockerfile
 
 Outputs:
   UpdateStatusApi:
     Description: "API Gateway endpoint for UpdateStatusFunction"
-    Value:
-      Fn::Sub: "https://${MyExistingHttpApi}.execute-api.${AWS::Region}.amazonaws.com/device/update-status"
+    Value: !Sub "https://${MyExistingHttpApi}.execute-api.${AWS::Region}.amazonaws.com/device/update-status"
 
   AddDeviceApi:
     Description: "API Gateway endpoint for AddDeviceFunction"
-    Value:
-      Fn::Sub: "https://${MyExistingHttpApi}.execute-api.${AWS::Region}.amazonaws.com/device/add"
+    Value: !Sub "https://${MyExistingHttpApi}.execute-api.${AWS::Region}.amazonaws.com/device/add"

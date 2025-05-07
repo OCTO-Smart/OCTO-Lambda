@@ -13,6 +13,7 @@
     "DB_USER": "ivoc",
     "DB_PASSWORD": "ivocDevDB!",
     "REGION": "eu-west-1",
-    "ENV": "Development"
+    "ENV": "Development",
+    "ADD_DEVICE_FUNCTION_NAME": "AddDeviceFunction"
   }
 }

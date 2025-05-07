@@ -449,3 +449,4 @@ Outputs:
     Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/device/update"
 
 
+

@@ -15,7 +15,7 @@ DB_PARAMS = {
     'port': os.getenv('DBPORT', '5432')
 }
 
-ALLOWED_FIELDS = ['name', 'serial_number', 'type']
+ALLOWED_FIELDS = ['name', 'type']
 
 def get_db_connection():
     return psycopg2.connect(**DB_PARAMS)
@@ -37,7 +37,6 @@ def lambda_handler(event, context):
 
         fields_to_update = {
             "name": body.get("device_name"),
-            "serial_number": body.get("serial"),
             "type": body.get("type")
         }
 
