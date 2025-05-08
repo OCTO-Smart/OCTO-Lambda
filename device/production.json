@@ -5,7 +5,8 @@
       "DB_USER": "ivoc",
       "DB_PASSWORD": "ivocDevDB!",
       "REGION": "eu-central-1",
-      "ENV": "Production"
+      "ENV": "Production",
+      "BUCKET_NAME" : "ivocdevices"
     },
     "UpdateStatusFunction": {
       "DB_HOST": "ivocdev.cxiqcy2uo0c3.eu-central-1.rds.amazonaws.com",
@@ -13,7 +14,8 @@
       "DB_USER": "ivoc",
       "DB_PASSWORD": "ivocDevDB!",
       "REGION": "eu-central-1",
-      "ENV": "Production"
+      "ENV": "Production",
+      "BUCKET_NAME" : "ivocdevices"
     }
   }
   

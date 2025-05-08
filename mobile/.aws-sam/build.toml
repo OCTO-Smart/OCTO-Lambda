@@ -90,4 +90,13 @@ manifest_hash = "ffdd2fc6d93cd6aed2b56771419c5194"
 packagetype = "Zip"
 functions = ["DeviceUpdateFunction"]
 
+[function_build_definitions.03686cfd-a568-4b76-96c7-dc3f9fe26559]
+codeuri = "C:\\Users\\Mert\\Documents\\GitHub\\OCTO-Lambda\\mobile\\cognito-client"
+runtime = "python3.12"
+architecture = "x86_64"
+handler = "login.lambda_handler"
+manifest_hash = ""
+packagetype = "Zip"
+functions = ["LoginFunction"]
+
 [layer_build_definitions]

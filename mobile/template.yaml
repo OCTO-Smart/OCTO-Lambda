@@ -398,6 +398,30 @@ Resources:
             Auth:
               Authorizer: CognitoAuth
 
+  LoginFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cognito-client/
+      Handler: login.lambda_handler
+      Runtime: python3.12
+      Timeout: 15
+      Environment:
+        Variables:
+          COGNITOCLIENTID: !Ref COGNITOCLIENTID
+          COGNITOPOOLID:  !Ref COGNITOPOOLID
+          REGION:         !Ref REGION
+          DBHOST:         !Ref DBHOST
+          DBNAME:         !Ref DBNAME
+          DBUSER:         !Ref DBUSER
+          DBPASSWORD:     !Ref DBPASSWORD
+      Events:
+        Login:
+          Type: HttpApi
+          Properties:
+            Path: /login
+            Method: post
+            ApiId: !Ref HttpApi
+
 
 Outputs:
   CognitoUserPoolId:
@@ -447,5 +471,9 @@ Outputs:
   DeviceUpdateApi:
     Description: "API Gateway endpoint for POST /device/update"
     Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/device/update"
+
+  LoginApi:
+    Description: "API Gateway endpoint for LoginFunction"
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/login"
 
 

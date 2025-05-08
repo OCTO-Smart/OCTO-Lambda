@@ -17,6 +17,9 @@ Parameters:
     Type: String
   REGION:
     Type: String
+  BUCKETNAME:              
+    Type: String
+    Description: "ivocdevices-dev"
 
 Resources:
   MyExistingHttpApi:
@@ -34,6 +37,10 @@ Resources:
         - x86_64
       Timeout: 30
       Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref BUCKETNAME
+        - LambdaInvokePolicy:          
+            FunctionName: !Ref AddDeviceFunction
         - Version: '2012-10-17'
           Statement:
             - Effect: Allow
@@ -41,6 +48,7 @@ Resources:
                 - s3:PutObject
               Resource:
                 - arn:aws:s3:::ivocdevices/*
+                - arn:aws:s3:::${BUCKETNAME}/*
       Environment:
         Variables:
           DB_HOST: !Ref DBHOST
@@ -49,6 +57,8 @@ Resources:
           DB_PASSWORD: !Ref DBPASSWORD
           REGION: !Ref REGION
           ENV: !Ref Environment
+          ADD_DEVICE_FUNCTION_NAME: !Ref AddDeviceFunction
+          BUCKET_NAME: !Ref BUCKETNAME
       Events:
         UpdateStatus:
           Type: HttpApi
@@ -75,7 +85,7 @@ Resources:
             - Effect: Allow
               Action:
                 - rds-db:connect
-              Resource: "*"  # Gerekirse RDS ARN ile sınırla
+              Resource: "*"  
       Environment:
         Variables:
           DB_HOST: !Ref DBHOST

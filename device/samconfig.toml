@@ -23,6 +23,7 @@ parameter_overrides = [
   "DBUSER=ivoc",
   "DBPASSWORD=ivocDevDB!",
   "REGION=eu-west-1",
+  "BUCKETNAME=ivocdevices-dev",
 ]
 
 [default.package.parameters]
@@ -39,6 +40,8 @@ parameter_overrides = [
   "DBUSER=ivoc",
   "DBPASSWORD=ivocDevDB!",
   "REGION=eu-west-1",
+  "BUCKETNAME = ivocdevices-dev",
+  
 ]
 
 [prod.deploy.parameters]
@@ -53,6 +56,7 @@ parameter_overrides = [
   "DBUSER=ivoc",
   "DBPASSWORD=ivocDevDB!",
   "REGION=eu-central-1",
+  "BUCKETNAME = ivocdevices",
 ]
 
 
