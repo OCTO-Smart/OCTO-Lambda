@@ -15,7 +15,7 @@ DB_USER                     = os.environ["DB_USER"]
 DB_PASSWORD                 = os.environ["DB_PASSWORD"]
 REGION                      = os.environ["REGION"]
 BUCKET_NAME                 = os.environ["BUCKET_NAME"]
-ADD_DEVICE_FUNCTION_NAME    = os.environ["ADD_DEVICE_FUNCTION_NAME"]
+ADD_DEVICE_FUNCTION_NAME    = "AddDeviceFunction"
 
 s3 = boto3.client("s3", region_name=REGION)
 lambda_client = boto3.client("lambda", region_name=REGION)
@@ -54,10 +54,9 @@ def lambda_handler(event, context):
         else:
 
             payload = {
-                "userid":    data.get("userid", 1),
                 "devicename": data.get("dn", serial),
                 "serial":    serial,
-                "type":      data.get("type", 1)
+                "type":      data.get("type", 0)
             }
             try:
                 resp = lambda_client.invoke(
@@ -80,17 +79,29 @@ def lambda_handler(event, context):
 
         timestamp   = datetime.utcnow()
         status_json = json.dumps(status)
-        cur.execute("""
+
+        upsert_sql = """
             INSERT INTO device_status (device_id, status, updated_at)
             VALUES (%s, %s, %s)
             ON CONFLICT (device_id)
-            DO UPDATE SET
-              status     = EXCLUDED.status,
-              updated_at = EXCLUDED.updated_at
-        """, (device_id, status_json, timestamp))
-        logger.info("Upserted status record")
+              DO UPDATE SET
+                status     = EXCLUDED.status,
+                updated_at = EXCLUDED.updated_at
+        """
+        cur.execute(upsert_sql, (device_id, status_json, timestamp))
+        logger.info(f"Upserted status (rowcount={cur.rowcount})")
 
-        s3_key = f"{serial}/{timestamp.strftime('%Y%m%dT%H%M%SZ')}.json"
+        log_sql = """
+           INSERT INTO device_log (device_id, status, "timestamp")
+           VALUES (%s, %s, %s)
+        """
+        cur.execute(log_sql, (device_id, status_json, timestamp))
+        logger.info(f"Inserted log (rowcount={cur.rowcount})")
+
+
+        logger.info(f"Log insert çalıştı: statusmessage={cur.statusmessage}, rowcount={cur.rowcount}")
+        logger.info("Inserted log record into device_log")
+        s3_key = f"{serial}.json"
         s3.put_object(Bucket=BUCKET_NAME, Key=s3_key, Body=status_json)
         logger.info(f"Wrote to S3: {s3_key}")
 

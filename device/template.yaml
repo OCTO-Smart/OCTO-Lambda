@@ -37,18 +37,21 @@ Resources:
         - x86_64
       Timeout: 30
       Policies:
+    
         - S3CrudPolicy:
             BucketName: !Ref BUCKETNAME
-        - LambdaInvokePolicy:          
+
+        - LambdaInvokePolicy:
             FunctionName: !Ref AddDeviceFunction
+
         - Version: '2012-10-17'
           Statement:
             - Effect: Allow
               Action:
                 - s3:PutObject
               Resource:
-                - arn:aws:s3:::ivocdevices/*
-                - arn:aws:s3:::${BUCKETNAME}/*
+                - !Sub "arn:aws:s3:::${BUCKETNAME}/*"
+                
       Environment:
         Variables:
           DB_HOST: !Ref DBHOST
@@ -73,6 +76,7 @@ Resources:
   AddDeviceFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: AddDeviceFunction
       CodeUri: functions/add-device/
       Handler: app.lambda_handler
       Runtime: python3.12
